@@ -7,6 +7,7 @@ import { PersonalCabinet } from './containers/PersonalCabinet'
 import { createStackNavigator } from '@react-navigation/stack'
 import { PaperProvider } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/FontAwesome5'
+import { AddReportPage } from './containers/AddReportPage'
 
 const Tab = createBottomTabNavigator()
 const Stack = createStackNavigator()
@@ -37,6 +38,24 @@ const App = () => {
                                 />
                             )
                         },
+                    }}
+                />
+                <Tab.Screen
+                    name="AddReportPage"
+                    component={AddReportPage}
+                    options={{
+                        headerShown: false,
+                        tabBarIcon: (tabInfo) => {
+                            return (
+                                <Icon
+                                    name="plus-circle"
+                                    size={48}
+                                    style={{ position: 'absolute', top: -20 }}
+                                    color={tabInfo.focused ? '#006600' : '#8e8e93'}
+                                />
+                            )
+                        },
+                        title: 'Добавить',
                     }}
                 />
                 <Tab.Screen
