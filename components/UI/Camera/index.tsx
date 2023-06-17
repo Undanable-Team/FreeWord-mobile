@@ -10,7 +10,7 @@ const tag = '[CAMERA]'
 interface props {
     capturedImage: any
     setCapturedImage: any
-    onClose: any
+    onClose?: any
     onSubmit?: any
 }
 
@@ -38,7 +38,7 @@ export const CameraComponent: React.FC<props> = ({
     // }
     const takePicture = async () => {
         if (!camera) return
-        const photo = await camera.takePictureAsync()
+        const photo = await camera.takePictureAsync({ base64: true })
         console.log(photo)
         setPreviewVisible(true)
         setCapturedImage(photo)
@@ -160,16 +160,18 @@ export const CameraComponent: React.FC<props> = ({
                                     right: '5%',
                                 }}
                             >
-                                <TouchableOpacity onPress={onClose}>
-                                    <Text
-                                        style={{
-                                            color: '#fff',
-                                            fontSize: 20,
-                                        }}
-                                    >
-                                        <Icon name="ios-close" size={32} color={'#fff'} />
-                                    </Text>
-                                </TouchableOpacity>
+                                {onClose && (
+                                    <TouchableOpacity onPress={onClose}>
+                                        <Text
+                                            style={{
+                                                color: '#fff',
+                                                fontSize: 20,
+                                            }}
+                                        >
+                                            <Icon name="ios-close" size={32} color={'#fff'} />
+                                        </Text>
+                                    </TouchableOpacity>
+                                )}
                             </View>
 
                             <View
