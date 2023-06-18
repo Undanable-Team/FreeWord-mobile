@@ -1,38 +1,51 @@
 {
-    "expo": {
-        "name": "FreeWord-mobile",
-        "slug": "FreeWord-mobile",
-        "version": "1.0.0",
-        "orientation": "portrait",
-        "icon": "./assets/icon.png",
-        "userInterfaceStyle": "light",
-        "splash": {
-            "image": "./assets/splash.png",
-            "resizeMode": "contain",
-            "backgroundColor": "#ffffff"
-        },
-        "assetBundlePatterns": ["**/*"],
-        "ios": {
-            "supportsTablet": true
-        },
-        "android": {
-            "permissions": ["CAMERA", "FLASHLIGHT"],
-            "adaptiveIcon": {
-                "foregroundImage": "./assets/adaptive-icon.png",
-                "backgroundColor": "#ffffff"
-            }
-        },
-        "web": {
-            "favicon": "./assets/favicon.png"
-        },
-        "plugins": [
-            [
-                "expo-camera",
-                {
-                    "cameraPermission": "Позвольте FreeWord получить доступ к камере.",
-                    "microphonePermission": "Позвольте FreeWord получить доступ к микрофону"
-                }
-            ]
-        ]
+  "expo": {
+    "name": "FreeWord-mobile",
+    "slug": "FreeWord-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "permissions": [
+        "CAMERA",
+        "FLASHLIGHT",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.ninesirius.FreeWordmobile"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Позвольте FreeWord получить доступ к камере.",
+          "microphonePermission": "Позвольте FreeWord получить доступ к микрофону"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d9582a5a-e5e9-45e9-816d-08b6d9696d1f"
+      }
     }
+  }
 }

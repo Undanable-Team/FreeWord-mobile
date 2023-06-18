@@ -1,3 +1,5 @@
+// App.tsx
+
 import { HomePage } from './containers/HomePage/index'
 import { StyleSheet, Text, View } from 'react-native'
 
@@ -11,15 +13,52 @@ import { AddReportPage } from './containers/AddReportPage'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useEffect, useState } from 'react'
 import { AuthPage } from './containers/AuthPage'
+import FullPost from './containers/FullPost'
+import { RegisterPage } from './containers/RegisterPage'
 
 const Tab = createBottomTabNavigator()
 const Stack = createStackNavigator()
 
-export const storeData = async (value: string) => {
+const Home = () => {
+    return (
+        <Stack.Navigator>
+            <Stack.Screen name="Home" component={HomePage} options={{ headerTitle: 'FreeWord' }} />
+            <Stack.Screen
+                name="FullPost"
+                component={FullPost}
+                options={{ headerTitle: 'FreeWord' }}
+            />
+        </Stack.Navigator>
+    )
+}
+
+export const storeData = async (value: string, updateToken) => {
     try {
         await AsyncStorage.setItem('@jwt_token', value)
+        updateToken(value)
     } catch (e) {
         console.log(e) // Обработка ошибок сохранения
+    }
+}
+
+export const removeToken = async (updateToken) => {
+    // Передаем функцию updateToken
+    try {
+        await AsyncStorage.removeItem('@jwt_token')
+        updateToken(null) // Вызываем функцию updateToken с аргументом null для обновления токена в App
+    } catch (e) {
+        console.log(e) // Обработка ошибок удаления
+    }
+}
+
+export const getToken = async (): Promise<any> => {
+    try {
+        const value = await AsyncStorage.getItem('@jwt_token')
+        if (value) {
+            return value
+        }
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -32,6 +71,8 @@ const App = () => {
                 const value = await AsyncStorage.getItem('@jwt_token')
                 if (value) {
                     setToken(value)
+                } else {
+                    setToken(null)
                 }
             } catch (e) {
                 console.log(e) // Обработка ошибок чтения
@@ -47,7 +88,7 @@ const App = () => {
                 <Tab.Navigator>
                     <Tab.Screen
                         name="Главная"
-                        component={HomePage}
+                        component={Home}
                         options={{
                             headerShown: false,
                             tabBarIcon: (tabInfo) => {
@@ -76,12 +117,12 @@ const App = () => {
                                     />
                                 )
                             },
-                            title: 'Добавить',
+                            title: 'Добавить жалобу',
                         }}
                     />
                     <Tab.Screen
                         name="Личный кабинет"
-                        component={PersonalCabinet}
+                        component={() => <PersonalCabinet setToken={setToken} />}
                         options={{
                             headerShown: false,
                             tabBarIcon: (tabInfo) => {
@@ -104,7 +145,16 @@ const App = () => {
                 <Stack.Navigator>
                     <Stack.Screen
                         name="auth"
-                        component={AuthPage}
+                        component={({ navigation }) => (
+                            <AuthPage setToken={setToken} navigation={navigation} />
+                        )}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="register"
+                        component={({ navigation }) => (
+                            <RegisterPage setToken={setToken} navigation={navigation} />
+                        )}
                         options={{ headerShown: false }}
                     />
                 </Stack.Navigator>

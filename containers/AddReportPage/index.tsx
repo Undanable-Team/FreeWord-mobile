@@ -35,9 +35,9 @@ export const AddReportPage = () => {
         console.log(capturedImage)
         // formData.append("files", capturedImage)
         uploadToStrapi(capturedImage.uri).then((resp) =>
-            createReport({ ...report, media: { ...resp.data[0] } }).then((resp) => {
-                setLoading(false)
-            }),
+            createReport({ ...report, media: { ...resp.data[0] } })
+                .then((resp) => console.log(resp))
+                .finally(() => setLoading(false)),
         )
     }
 

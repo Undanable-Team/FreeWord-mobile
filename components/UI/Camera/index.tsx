@@ -114,8 +114,8 @@ export const CameraComponent: React.FC<props> = ({
                                 <TouchableOpacity
                                     onPress={() => {
                                         onSubmit
-                                            ? onSubmit(capturedImage.uri)
-                                            : () => saveImage(capturedImage.uri)
+                                            ? onSubmit(capturedImage)
+                                            : saveImage(capturedImage)
                                     }}
                                     style={{
                                         width: 130,

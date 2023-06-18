@@ -1,6 +1,7 @@
 import React from 'react'
 import { Alert } from 'react-native'
 import * as FileSystem from 'expo-file-system'
+import { getToken } from '../App'
 
 const { default: axios } = require('axios')
 
@@ -50,4 +51,18 @@ export const uploadToStrapi = async (uri) => {
 export const loginUser = async (data: any): Promise<any> => {
     // console.log(data)
     return await freewordApi.post('auth/local', { ...data })
+}
+
+export const getUserMe = async (): Promise<any> => {
+    const token = await getToken()
+    console.log(token)
+    return await freewordApi.get('users/me?populate=deep', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    })
+}
+
+export const updateUserInfo = async (id: number, data: any) => {
+    return await freewordApi.put(`users/${id}`, { data: data })
 }

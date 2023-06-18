@@ -1,22 +1,32 @@
 import React, { useState } from 'react'
-import { StyleSheet } from 'react-native'
-import { Button, Text, TextInput } from 'react-native-paper'
+import { Pressable, StyleSheet } from 'react-native'
+import { ActivityIndicator, Button, Text, TextInput } from 'react-native-paper'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { loginUser } from '../../api/request'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { storeData } from '../../App'
+import { Link } from '@react-navigation/native'
 
-export const AuthPage = () => {
-    const [loginData, setLoginData] = useState<{ identifier: string; password: string }>({
+interface login {
+    identifier: string
+    password: string
+}
+
+export const AuthPage = ({ setToken, navigation }) => {
+    const [loginData, setLoginData] = useState<login>({
         identifier: '',
         password: '',
     })
 
+    const [loading, setLoading] = useState<boolean>(false)
+
     const submit = () => {
+        setLoading(true)
         loginUser(loginData)
             .then((resp) => {
                 console.log(resp)
-                storeData(resp.data.jwt)
+                storeData(resp.data.jwt, setToken)
+                setLoading(false)
                 // setToken(resp.data.jwt) // Добавлено: сохраняем токен в состоянии
             })
             .catch((err) => console.log(err))
@@ -30,21 +40,32 @@ export const AuthPage = () => {
 
     return (
         <SafeAreaView style={styles.form}>
+            <Text>С возвращением в FreeWord</Text>
             <TextInput
                 label="Логин"
                 mode="outlined"
                 onChangeText={(text) => change(text, 'identifier')}
                 value={loginData.identifier}
+                disabled={loading}
             />
             <TextInput
                 label="Пароль"
                 mode="outlined"
                 onChangeText={(text) => change(text, 'password')}
                 value={loginData.password}
+                disabled={loading}
             />
-            <Button mode="contained" onPress={submit}>
-                Войти
+            <Button mode="contained" onPress={submit} disabled={loading}>
+                {loading ? (
+                    <ActivityIndicator animating={true} size="small" color={'#fff'} />
+                ) : (
+                    'Войти'
+                )}
             </Button>
+
+            <Pressable onPress={() => navigation.navigate('register')}>
+                <Text>Зарегистрироваться</Text>
+            </Pressable>
         </SafeAreaView>
     )
 }

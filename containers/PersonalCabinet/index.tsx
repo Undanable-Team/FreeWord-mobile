@@ -5,9 +5,13 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import { RequestPage } from './RequestPage'
 import { NavigationContainer } from '@react-navigation/native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Camera } from 'expo-camera'
 import { CameraComponent } from '../../components/UI/Camera'
+import { removeToken, storeData } from '../../App'
+import { getUserMe, updateUserInfo } from '../../api/request'
+import { ReportCard, ReportsPage } from './ReportCaed'
+import { FlatList } from 'react-native-gesture-handler'
 
 const Tab = createMaterialTopTabNavigator()
 
@@ -15,24 +19,29 @@ export interface User {
     firstname: string
     lastname: string
     avatar?: string
+    id: number
 }
 
-export const PersonalCabinet = () => {
+export const PersonalCabinet = ({ setToken }) => {
     const [user, setUser] = useState<User>({
         firstname: 'Руслан',
         lastname: 'Булах',
         avatar: 'https://cdn-icons-png.flaticon.com/512/21/21104.png',
+        id: null,
     })
 
     const [userDraft, setUserDraft] = useState<User>({
         firstname: user.firstname,
         lastname: user.lastname,
         avatar: user.avatar,
+        id: user.id,
     })
     const [edit, setEdit] = useState<boolean>(false)
     const [avatarEditMenuStatus, setAvatarEditMenuStatus] = useState<boolean>(true)
     const [takePictureStatus, setTakePictureStatus] = useState<boolean>(false)
     const [capturedImage, setCapturedImage] = useState<any>(false)
+    const [loading, setLoading] = useState<boolean>(true)
+    const [reports, setReports] = useState<any[]>([])
 
     const change = (text: string, key: string) => {
         setUserDraft((prev) => {
@@ -48,14 +57,41 @@ export const PersonalCabinet = () => {
         setEdit(false)
     }
 
+    useEffect(() => {
+        getUserMe()
+            .then((resp) => {
+                console.log(resp)
+                setUser({
+                    ...resp.data,
+                })
+                setUserDraft({
+                    ...resp.data,
+                })
+                setReports(resp.data.reports)
+            })
+            .finally(() => setLoading(false))
+    }, [])
+
     const closeMenu = () => setAvatarEditMenuStatus(false)
     const openMenu = () => setAvatarEditMenuStatus(true)
 
     const saveEditData = () => {
+        updateUserInfo(user.id, userDraft)
+            .then((resp) => {
+                console.log(resp)
+            })
+            .finally((resp) => setEdit(false))
         setUser((prev) => {
             return { ...prev, ...userDraft }
         })
-        setEdit(false)
+    }
+
+    if (loading) {
+        return (
+            <SafeAreaView>
+                <Text>Загрузка данных о вас</Text>
+            </SafeAreaView>
+        )
     }
 
     if (takePictureStatus) {
@@ -66,7 +102,7 @@ export const PersonalCabinet = () => {
                 onClose={() => setTakePictureStatus(false)}
                 onSubmit={(imageUri) => {
                     setUserDraft((prev) => {
-                        return { ...prev, avatar: imageUri }
+                        return { ...prev, avatar: imageUri.uri }
                     })
                     setTakePictureStatus(false)
                 }}
@@ -154,9 +190,11 @@ export const PersonalCabinet = () => {
                     ) : (
                         <View style={styles['user-info']}>
                             <Image
-                                source={{
-                                    uri: 'https://cdn-icons-png.flaticon.com/512/21/21104.png',
-                                }}
+                                source={
+                                    !user.avatar
+                                        ? require('../../assets/base-avatar.png')
+                                        : { uri: user.avatar }
+                                }
                                 style={styles.avatar}
                             />
                             <Text style={styles.username}>
@@ -179,6 +217,15 @@ export const PersonalCabinet = () => {
                                 >
                                     Редактировать
                                 </Button>
+                                <Button
+                                    // icon={() => <Icon name="log-out" color={'#f2f2f2'} />}
+                                    style={styles['user-data-item']}
+                                    mode="contained"
+                                    buttonColor="#2b54a5"
+                                    onPress={() => removeToken(setToken)}
+                                >
+                                    Выйти
+                                </Button>
                             </View>
                         </View>
                     )}
@@ -197,7 +244,22 @@ export const PersonalCabinet = () => {
                     },
                 }}
             >
-                <Tab.Screen name="Ваши жалобы" component={RequestPage} />
+                <Tab.Screen
+                    name="Ваши жалобы"
+                    component={() => {
+                        return (
+                            <FlatList
+                                data={user.reports}
+                                style={{ flex: 1, padding: 15 }}
+                                scrollEnabled={true}
+                                renderItem={({ item }) => {
+                                    console.log(item)
+                                    return <ReportCard title={item.title} media={item.media.url} />
+                                }}
+                            />
+                        )
+                    }}
+                />
                 <Tab.Screen name="Счета" component={RequestPage} />
             </Tab.Navigator>
         </NavigationContainer>
